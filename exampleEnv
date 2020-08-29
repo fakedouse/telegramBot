@@ -1,0 +1,3 @@
+// Rename this file to '.env' and sets following values
+
+BOT_TOKEN='set this'

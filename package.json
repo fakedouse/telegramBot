@@ -1,0 +1,30 @@
+{
+  "name": "telegrambot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "start": "nodemon bot.js",
+    "debug": "nodemon --inspect bot.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fakedouse/telegramBot.git"
+  },
+  "author": "Vitaliy V <vitalik.voronov1989@ya.ru>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fakedouse/telegramBot/issues"
+  },
+  "homepage": "https://github.com/fakedouse/telegramBot#readme",
+  "dependencies": {
+    "dotenv": "8.2.0",
+    "mongodb": "^3.6.0",
+    "mongoose": "^5.10.2",
+    "telegraf": "^3.38.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
