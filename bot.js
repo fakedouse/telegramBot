@@ -1,63 +1,33 @@
 require('dotenv').config()
+
 const { Telegraf, Markup, Extra, Stage, session } = require('telegraf')
-const filthywords = require('./badwords.json').filthywords
-const bot = new Telegraf(process.env.BOT_TOKEN) //сюда помещается токен, который дал botFather
+const commands = require('./src/commands')
+const actions = require('./src/actions')
+const validate = require('./src/validate')
+const bot = new Telegraf(process.env.BOT_TOKEN)
 const stage = new Stage()
 
 
-bot.use(Telegraf.log()) // Встроенный логгер
 bot.use(session()) 
 bot.use(stage.middleware())
 
-bot.start(async (ctx) => {
-    await ctx.reply(`
-        Привет ${ctx.from.first_name}!\nЭто бот-консультант, он поможет тебе составить список дел, организовать свое время, и не забыть о важном.
-    `)
-    // const ForwardMessage = await ctx.tg.forwardMessage(ctx.chat.id)
-    // console.log(`Forward message: ${ForwardMessage}`)
+commands.middleware(bot)
+actions.middleware(bot)
 
-    const ChatId = ctx.chat.id
-    console.log(`Chat_Id: ${ChatId}`)
-})
-
-bot.help((ctx) => ctx.reply('Send me a sticker')) //ответ бота на команду /help
-bot.settings(({reply}) => {
-    reply('One time keyboard', Markup
-        .keyboard(['/simple', '/inline', '/pyramid', '/special', '/caption', '/random'])
-        .oneTime()
-        .resize()
-        .extra()
-    )
-})
-
-
-bot.command('inline', (ctx) => {
-    return ctx.reply('<b>Coke</b> or <i>Pepsi?</i>', Extra.HTML().markup((m) =>
-        m.inlineKeyboard([
-            m.callbackButton('Coke', 'Coke'),
-            m.callbackButton('Pepsi', 'Pepsi'),
-            m.callbackButton('Limonade', 'Limonade')
-        ])))
-})
-
-bot.action(/.+/, (ctx) => {
-    return ctx.answerCbQuery(`Oh, ${ctx.match[0]}! Great choice`)
-})
 
 bot.use((ctx, next) => {
     console.log(`Пишет ${ctx.from.username}\n"${ctx.message.text}"`)
     next()
 })
 
-bot.on('sticker', (ctx) => ctx.reply('👍')) //bot.on это обработчик введенного юзером сообщения, в данном случае он отслеживает стикер, можно использовать обработчик текста или голосового сообщения
 
-bot.hears('hi', (ctx) => ctx.reply('Hey there')) // bot.hears это обработчик конкретного текста, данном случае это - "hi"
+bot.on('sticker', (ctx) => ctx.reply('👍'))
+
+bot.hears('hi', (ctx) => ctx.reply('Hey there'))
 bot.hears('Привет', (ctx) => ctx.reply(`Привет ${ctx.from.first_name}!`))
-bot.hears('Стикер', (ctx) => ctx.replyWithSticker('123123jkbhj6b'))
 
 bot.on('text', async ctx => {
-    if (ctx.message.text.split(/[^А-Яа-я]/).find(item => filthywords.includes(item.toLowerCase()))) return ctx.reply('Не матюкайтесь!')
-    ctx.reply("Ага ;)")
+    if(validate.filty(ctx)) await ctx.reply("Ага ;)")
 })
 
 // обработка ошибок
